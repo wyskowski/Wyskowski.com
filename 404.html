@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>404 — Page not found | Wyskowski</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0b1c16" />
+  <!-- Favicons (must exist at repo root) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+  <link rel="shortcut icon" href="/assets/img/favicon.ico">
+  <!-- Font (optional; safe if it fails) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg0:#0b1c16; --card:#0f2320; --text:#e6f1ee; --muted:#9fb3ad;
+      --accent:#11c87e; --accent2:#20e3b2; --border:rgba(255,255,255,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 500px at 12% -10%, #123127 0%, transparent 60%),
+        radial-gradient(1000px 500px at 100% -10%, #132a3a 0%, transparent 65%),
+        linear-gradient(180deg, var(--bg0), #0c1714);
+      display:grid; place-items:center; padding:24px;
+    }
+    .card{
+      width:min(920px,96vw); padding:28px 24px; border-radius:20px;
+      background:color-mix(in oklab, var(--card) 92%, #0e1d18 8%);
+      border:1px solid var(--border); box-shadow:0 10px 40px rgba(0,0,0,.45);
+    }
+    .row{display:flex; gap:22px; align-items:center; flex-wrap:wrap}
+    .badge{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 14px; border-radius:999px; background:#0e2a23; border:1px solid var(--border);
+      color:#a9ffe2; font-weight:700;
+    }
+    .code{
+      font-size: clamp(2.2rem, 6vw, 4rem); font-weight:800; letter-spacing:-.02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text; background-clip:text; color:transparent; margin:0;
+      text-shadow: 0 1px 0 rgba(0,0,0,.3);
+    }
+    p{color:var(--muted); margin:.5rem 0 1.2rem; max-width:70ch}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+    .btn{
+      border:0; border-radius:12px; padding:10px 14px; cursor:pointer; font-weight:800; letter-spacing:.01em;
+      text-decoration:none; display:inline-flex; align-items:center; gap:.5rem;
+    }
+    .btn.primary{ background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#02140f; }
+    .btn.ghost{ background:#1b2b2b; color:#dcefeb; border:1px solid var(--border); }
+    .search{
+      margin-top:14px; display:flex; gap:8px; flex-wrap:wrap
+    }
+    .search input{
+      flex:1 1 280px; min-width:240px; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+      background:#0f1c22; color:var(--text); outline:none;
+    }
+    .hint{font-size:.9rem; color:#8aa19a; margin-top:10px}
+    .hint a{color:var(--accent); text-decoration:none}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="t">
+    <div class="row">
+      <span class="badge" aria-hidden="true">← Route not found</span>
+      <h1 id="t" class="code">404</h1>
+    </div>
+    <p>We couldn’t find that page. It may have moved or the link is outdated.</p>
+
+    <div class="actions">
+      <button class="btn ghost" onclick="history.back()"><span>⟵</span>Go back</button>
+      <a class="btn ghost" href="/" aria-label="Back to Wyskowski.com">Home</a>
+      <a class="btn ghost" href="/projects/" aria-label="View projects">Projects</a>
+      <!-- Use ONE of the poll links below depending on where your poll lives -->
+      <a class="btn primary" href="/projects/food-poll/" aria-label="Open Favorite Food Poll">Try the Food Poll</a>
+      <!-- If your poll is still at /food/Favfood.html, use this instead:
+      <a class="btn primary" href="/food/Favfood.html" aria-label="Open Favorite Food Poll">Try the Food Poll</a>
+      -->
+    </div>
+
+    <!-- Site search (Google, restricted to your domain) -->
+    <form class="search" action="https://www.google.com/search" method="get" role="search" aria-label="Search Wyskowski.com">
+      <input type="hidden" name="q" value="site:wyskowski.com">
+      <input type="text" name="q" placeholder="Search Wyskowski.com" aria-label="Search query" />
+      <button class="btn ghost" type="submit">Search</button>
+    </form>
+
+    <p class="hint">Still stuck? <a href="mailto:hello@wyskowski.com">Email me</a> and I’ll fix the link.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Favorite Food Poll</title>
+  <meta name="description" content="Vote once — see a live donut chart. Local demo (one vote per browser)." />
+  <meta name="theme-color" content="#0b1c16" />
+  <!-- Favicons (must exist at repo root) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../assets/img/favicon-16x16.png">
+  <link rel="shortcut icon" href="../../assets/img/favicon.ico">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
+
+
+  <!-- App -->
+  <link rel="stylesheet" href="looks.css" />
+  <script src="app.js" defer></script>
+  
+</head>
+<body>
+  <!-- Soft gradient / blur background -->
+  <div class="bg-blob bg-1" aria-hidden="true"></div>
+  <div class="bg-blob bg-2" aria-hidden="true"></div>
+
+  <main class="frame">
+    <article class="card" role="region" aria-labelledby="title">
+      <header class="head">
+        <h1 id="title" class="title">What’s your favorite food?</h1>
+<p class="sub">Cast a vote — see real-time global results. (Supabase-backed; one vote per browser.)</p>
+      </header>
+
+      <!-- Options -->
+      <section aria-label="Options">
+        <div class="options" id="optionButtons"></div>
+      </section>
+
+      <!-- Meta pills above chart -->
+      <section class="metaRow" aria-label="Status">
+        <span class="badge tone" id="leaderBadge" hidden>
+          <span class="dot"></span>
+          <span id="leaderText">Top choice: —</span>
+        </span>
+        <div class="badgeGroup">
+          <span class="badge" id="totalVotes">Total votes: 0</span>
+          <span class="badge" id="voteStatus">You haven’t voted yet.</span>
+        </div>
+      </section>
+
+      <!-- Chart + info column -->
+      <section class="chartShell" aria-label="Results">
+        <div class="chartWrap">
+          <!-- no fixed height attribute -->
+          <canvas id="foodChart" aria-label="Results donut chart" role="img"></canvas>
+        </div>
+
+        <aside class="chartInfo">
+          <h3>Business & data skills demonstrated</h3>
+          <p>Backed by Postgres (Supabase) to mirror real product analytics.</p>
+<ul class="skills-list">
+  <li><span class="ico">📊</span>KPI framing & live dashboarding</li>
+  <li><span class="ico">🗄️</span>Relational data modeling</li>
+  <li><span class="ico">🛡️</span>Data governance: Row-Level Security</li>
+  <li><span class="ico">📤</span>Analytics-ready: SQL view + CSV/BI export</li>
+</ul>
+        </aside>
+      </section>
+
+      <!-- Legend -->
+      <section>
+        <div class="legend" id="legend"></div>
+      </section>
+
+      <!-- Actions -->
+<section class="actions">
+  <a class="btn ghost back-home" href="https://wyskowski.com/">← Back to wyskowski.com</a>
+  <button class="btn ghost" id="clearVoteBtn" type="button">Clear my vote</button>
+  <a class="btn primary" href="#" id="shareLink" role="button">Share</a>
+</section>
+    </article>
+  </main>
+
+  <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+</body>
+</html>

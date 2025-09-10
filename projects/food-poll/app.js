@@ -18,7 +18,7 @@ const clearBtn    = document.getElementById("clearVoteBtn");
 const shareLink   = document.getElementById("shareLink");
 const legendEl    = document.getElementById("legend");
 
-// Palette that matches your dark theme
+// Palette
 const PALETTE = ["#60A5FA","#F472B6","#F59E0B","#22C55E","#A78BFA","#38BDF8","#9CA3AF"];
 
 /* ---------- Stable anonymous voter id ---------- */
@@ -49,7 +49,7 @@ async function fetchResults(pollId) {
 async function castVote(pollId, optionId) {
   const voter_hash = await voterHashForPoll(POLL_SLUG);
   const { error } = await sb.from("votes").insert([{ poll_id: pollId, option_id: optionId, voter_hash }]);
-  if (error) throw error; // duplicate vote blocked by RLS/unique index
+  if (error) throw error;
 }
 
 /* ---------- UI: buttons ---------- */
@@ -121,7 +121,7 @@ function initChart(labels, data){
       }]
     },
     options:{
-      maintainAspectRatio: false,  // use CSS container height
+      maintainAspectRatio: false,
       cutout:"64%",
       radius:"86%",
       animation:{ duration:700, easing:"easeOutQuart" },
@@ -174,7 +174,7 @@ function updateMeta(labels, data){
   if (isUnique) leaderText.textContent = `Top choice: ${k}`;
 }
 
-/* ---------- Vote flow ---------- */
+/* ---------- Voting & clearing ---------- */
 function markVoted(label){
   Array.from(document.querySelectorAll(".btnOpt")).forEach(b=>{
     const l = b.textContent.trim();
@@ -189,12 +189,25 @@ async function handleVoteRemote(option){
     await castVote(poll.id, option.id);
     markVoted(option.label);
     voteStatus.textContent = `You voted: ${option.label}`;
-    await refreshResults(); // realtime will also kick in
-
-    const r = ctx.canvas.getBoundingClientRect();
-    burst(r.left+r.width/2, r.top+r.height/2);
+    await refreshResults();
+    const r = ctx.canvas.getBoundingClientRect(); burst(r.left+r.width/2, r.top+r.height/2);
   } catch (e){
     alert("Looks like you already voted in this browser.");
+  }
+}
+
+async function clearRemoteVote(){
+  try {
+    const hash = await voterHashForPoll(POLL_SLUG);
+    const { data: deleted, error } = await sb.rpc('delete_vote', { p_slug: POLL_SLUG, p_voter_hash: hash });
+    if (error) throw error;
+
+    document.querySelectorAll(".btnOpt").forEach(b => b.classList.remove("is-selected","is-dim"));
+    voteStatus.textContent = deleted > 0 ? "You haven’t voted yet." : "No vote found on this device.";
+    await refreshResults();
+  } catch (e){
+    console.error("clearRemoteVote error:", e);
+    alert("Couldn’t clear your vote. Please try again.");
   }
 }
 
@@ -227,28 +240,19 @@ function burst(x,y){
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const colors=["#22c55e","#20e3b2","#86efac","#34d399","#06b6d4","#60a5fa"];
   for(let i=0;i<120;i++){
-    bits.push({x,y, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.8)*6-2, g:.08,
-               s:Math.random()*4+2, c:colors[Math|Math.random()*colors.length], l:60+Math.random()*40});
+    bits.push({x,y, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.8)*6-2, g:.08, s:Math.random()*4+2, c:colors[Math|Math.random()*colors.length], l:60+Math.random()*40});
   }
   if(!active){ active=true; requestAnimationFrame(step); }
 }
 function step(){
   g.clearRect(0,0,cnf.width,cnf.height);
-  bits.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.l--;
-    g.fillStyle=p.c; g.fillRect(p.x,p.y,p.s,p.s);
-  });
+  bits.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.l--; g.fillStyle=p.c; g.fillRect(p.x,p.y,p.s,p.s); });
   bits=bits.filter(p=>p.l>0 && p.y<cnf.height+8);
   if(bits.length) requestAnimationFrame(step); else active=false;
 }
 
-/* ---------- Clear (resets local identity only) ---------- */
-clearBtn.addEventListener("click", () => {
-  // Do NOT remove client id. Just reset visuals & messaging.
-  voteStatus.textContent = "Your vote is recorded on this device.";
-  document.querySelectorAll(".btnOpt").forEach(b => b.classList.remove("is-selected", "is-dim"));
-});
-/* ---------- Share ---------- */
+/* ---------- Wire up ---------- */
+clearBtn.addEventListener("click", clearRemoteVote);
 shareLink.addEventListener("click", (e)=>{
   e.preventDefault();
   const data={ title:"Favorite Food Poll", text:"Cast your vote!", url:location.href };

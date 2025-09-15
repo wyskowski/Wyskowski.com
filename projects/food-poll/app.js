@@ -18,8 +18,11 @@ const clearBtn    = document.getElementById("clearVoteBtn");
 const shareLink   = document.getElementById("shareLink");
 const legendEl    = document.getElementById("legend");
 
-// Palette
-const PALETTE = ["#60A5FA","#F472B6","#F59E0B","#22C55E","#A78BFA","#38BDF8","#9CA3AF"];
+// Palette (8 colors for 8 foods)
+const PALETTE = [
+  "#60A5FA", "#F472B6", "#F59E0B", "#22C55E",
+  "#A78BFA", "#38BDF8", "#9CA3AF", "#F87171"
+];
 
 /* ---------- Stable anonymous voter id ---------- */
 function getClientId(){
@@ -34,18 +37,40 @@ async function sha256(s){
 async function voterHashForPoll(slug){ return sha256(getClientId() + "::" + slug); }
 
 /* ---------- Data access ---------- */
+// Desired order (DB may also have a position column; we honor that if present)
+const ORDER = ["Pizza","Burgers","Sushi","Tacos","Salad","Pasta","Wings","Other"];
+const orderRank = new Map(ORDER.map((l,i)=>[l, i]));
+const rankLabel = (label) =>
+  orderRank.has(label) ? orderRank.get(label) : (label.toLowerCase()==="other" ? 999 : 50);
+
 async function fetchPollAndOptions() {
   const { data: poll, error: e1 } = await sb.from("polls").select("*").eq("slug", POLL_SLUG).single();
   if (e1) throw e1;
-  const { data: opts, error: e2 } = await sb.from("options").select("id,label").eq("poll_id", poll.id).order("label");
+
+  // Try to get position if it exists; otherwise just id+label
+  let { data: opts, error: e2 } = await sb.from("options")
+    .select("id,label,position")
+    .eq("poll_id", poll.id);
   if (e2) throw e2;
+
+  // Sort by DB position first (if set), then our ORDER fallbacks
+  opts.sort((a,b) => {
+    const ap = (a.position ?? null), bp = (b.position ?? null);
+    if (ap != null && bp != null) return ap - bp;
+    if (ap != null) return -1;
+    if (bp != null) return  1;
+    return rankLabel(a.label) - rankLabel(b.label);
+  });
+
   return { poll, options: opts };
 }
+
 async function fetchResults(pollId) {
   const { data, error } = await sb.from("poll_results").select("*").eq("poll_id", pollId);
   if (error) throw error;
   return data; // [{poll_id, option_id, label, votes}, ...]
 }
+
 async function castVote(pollId, optionId) {
   const voter_hash = await voterHashForPoll(POLL_SLUG);
   const { error } = await sb.from("votes").insert([{ poll_id: pollId, option_id: optionId, voter_hash }]);
@@ -54,7 +79,10 @@ async function castVote(pollId, optionId) {
 
 /* ---------- UI: buttons ---------- */
 function iconFor(label){
-  const map = {Pizza:"🍕", Burgers:"🍔", Sushi:"🍣", Tacos:"🌮", Salad:"🥗", Pasta:"🍝", Other:"✨"};
+  const map = {
+    Pizza:"🍕", Burgers:"🍔", Sushi:"🍣", Tacos:"🌮",
+    Salad:"🥗", Pasta:"🍝", Wings:"🍗", Other:"✨"
+  };
   return map[label] || "✨";
 }
 function renderButtons(options){
@@ -68,7 +96,7 @@ function renderButtons(options){
     b.addEventListener("click", ()=> handleVoteRemote(o));
     optionButtons.appendChild(b);
   });
-  // a11y: keyboard
+  // a11y
   Array.from(document.querySelectorAll(".btnOpt")).forEach(b=>{
     b.setAttribute("tabindex","0");
     b.addEventListener("keydown", e=>{
@@ -128,10 +156,12 @@ function initChart(labels, data){
       plugins:{
         legend:{ display:false },
         tooltip:{ callbacks:{
-          label: c => {
-            const sum = data.reduce((a,b)=>a+b,0) || 1;
+          label: (c) => {
+            const arr = c.chart.data.datasets[0].data;
+            const sum = arr.reduce((a,b)=>a+b,0) || 1;
             const val = c.parsed;
-            return ` ${c.label}: ${val} (${Math.round(val/sum*100)}%)`;
+            const pct = Math.round(val / sum * 100);
+            return ` ${c.label}: ${val} (${pct}%)`;
           }
         }},
       }
@@ -190,7 +220,9 @@ async function handleVoteRemote(option){
     markVoted(option.label);
     voteStatus.textContent = `You voted: ${option.label}`;
     await refreshResults();
-    const r = ctx.canvas.getBoundingClientRect(); burst(r.left+r.width/2, r.top+r.height/2);
+
+    const r = ctx.canvas.getBoundingClientRect();
+    burst(r.left+r.width/2, r.top+r.height/2);
   } catch (e){
     alert("Looks like you already voted in this browser.");
   }
@@ -216,8 +248,9 @@ async function refreshResults(){
   const { poll, options } = window.__POLL_STATE__;
   const results = await fetchResults(poll.id);
   const byLabel = new Map(results.map(r=>[r.label, r.votes]));
-  const labels = options.map(o=>o.label);
-  const data = labels.map(l => byLabel.get(l) || 0);
+
+  const labels = options.map(o=>o.label);   // respect our fixed order
+  const data   = labels.map(l => byLabel.get(l) || 0);
 
   updateChart(labels, data);
   renderLegend(labels, data);
@@ -226,7 +259,7 @@ async function refreshResults(){
 
 function subscribeToResults(pollId){
   sb.channel('votes-feed')
-    .on('postgres_changes', { event:'INSERT', schema:'public', table:'votes', filter:`poll_id=eq.${pollId}` }, refreshResults)
+    .on('postgres_changes', { event:'*', schema:'public', table:'votes', filter:`poll_id=eq.${pollId}` }, refreshResults)
     .subscribe();
 }
 
@@ -240,13 +273,17 @@ function burst(x,y){
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const colors=["#22c55e","#20e3b2","#86efac","#34d399","#06b6d4","#60a5fa"];
   for(let i=0;i<120;i++){
-    bits.push({x,y, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.8)*6-2, g:.08, s:Math.random()*4+2, c:colors[Math|Math.random()*colors.length], l:60+Math.random()*40});
+    bits.push({x,y, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.8)*6-2, g:.08,
+               s:Math.random()*4+2, c:colors[Math|Math.random()*colors.length], l:60+Math.random()*40});
   }
   if(!active){ active=true; requestAnimationFrame(step); }
 }
 function step(){
   g.clearRect(0,0,cnf.width,cnf.height);
-  bits.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.l--; g.fillStyle=p.c; g.fillRect(p.x,p.y,p.s,p.s); });
+  bits.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=p.g; p.l--;
+    g.fillStyle=p.c; g.fillRect(p.x,p.y,p.s,p.s);
+  });
   bits=bits.filter(p=>p.l>0 && p.y<cnf.height+8);
   if(bits.length) requestAnimationFrame(step); else active=false;
 }

@@ -392,22 +392,24 @@
   <script>AOS.init();</script>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
+<!-- Person (Ryan) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": "https://wyskowski.com/#person",
   "name": "Ryan Wyskowski",
   "url": "https://wyskowski.com",
-  "image": "https://wyskowski.com/headshot.png",
+  "image": "https://wyskowski.com/assets/img/headshot.png",
   "jobTitle": "Business Student",
   "alumniOf": {
     "@type": "CollegeOrUniversity",
     "name": "Metropolitan Community College"
   },
+  "email": "mailto:ryan@wyskowski.com",
   "sameAs": [
     "https://www.linkedin.com/in/ryanwyskowski"
   ],
-  "email": "mailto:ryan@wyskowski.com",
   "knowsAbout": [
     "Lean Six Sigma",
     "Excel modeling",
@@ -416,17 +418,30 @@
     "Operations and strategy"
   ],
   "hasCredential": [
-    { "@type": "EducationalOccupationalCredential", "name": "Project Management (Coursera)" }
+    {
+      "@type": "EducationalOccupationalCredential",
+      "name": "Project Management (Coursera)"
+    }
   ]
 }
 </script>
 
+<!-- Organization (for logo in Search) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": "https://wyskowski.com/#org",
   "name": "Wyskowski",
   "url": "https://wyskowski.com",
+  "logo": "https://wyskowski.com/assets/img/rw2.png",
+  "image": "https://wyskowski.com/assets/img/rw2.png",
+  "sameAs": [
+    "https://www.linkedin.com/in/ryanwyskowski"
+  ],
+  "founder": {
+    "@id": "https://wyskowski.com/#person"
+  },
   "contactPoint": [{
     "@type": "ContactPoint",
     "contactType": "inquiries",

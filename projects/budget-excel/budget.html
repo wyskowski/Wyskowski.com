@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker | Ryan Wyskowski</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:#eef7f2;
+  color:#1b4332;
+}
+
+/* === Back Button === */
+.back-btn{
+  position:absolute;
+  top:30px;
+  left:30px;
+  text-decoration:none;
+  font-weight:600;
+  color:#14532d;
+  background:white;
+  padding:.6rem 1rem;
+  border-radius:8px;
+  box-shadow:0 8px 20px rgba(0,0,0,.1);
+  transition:.3s ease;
+}
+
+.back-btn:hover{
+  background:#34d399;
+  color:white;
+  transform:translateY(-2px);
+}
+
+/* === Layout === */
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:5rem 2rem;
+  text-align:center;
+}
+
+h1{
+  font-size:2.6rem;
+  margin-bottom:1rem;
+}
+
+.subtitle{
+  max-width:750px;
+  margin:0 auto 4rem auto;
+  font-size:1.05rem;
+  color:#334155;
+}
+
+/* === Mock Frame === */
+.mock-frame{
+  background:white;
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 35px 70px rgba(0,0,0,.18);
+  margin-bottom:4rem;
+}
+
+.mock-frame img{
+  width:100%;
+  height:auto;
+  border-radius:10px;
+}
+
+/* === Details === */
+.details{
+  max-width:750px;
+  margin:0 auto;
+  text-align:left;
+}
+
+.details h3{
+  margin-top:2rem;
+  color:#14532d;
+}
+
+.details ul,
+.details ol{
+  padding-left:1.2rem;
+  line-height:1.7;
+  color:#334155;
+}
+
+/* === Download Button === */
+.btn{
+  display:inline-block;
+  margin-top:2.5rem;
+  background:#34d399;
+  color:white;
+  padding:.9rem 1.8rem;
+  border-radius:10px;
+  font-weight:600;
+  text-decoration:none;
+  transition:.3s ease;
+}
+
+.btn:hover{
+  background:#059669;
+  transform:translateY(-3px);
+  box-shadow:0 12px 25px rgba(0,0,0,.15);
+}
+
+.skill-box{
+  margin-top:1.5rem;
+  font-size:.9rem;
+  color:#475569;
+  text-align:center;
+}
+
+@media (max-width:768px){
+  .back-btn{
+    position:static;
+    display:inline-block;
+    margin:20px;
+  }
+
+  .container{
+    padding:3rem 1.5rem;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<a href="https://wyskowski.com/#portfolio" class="back-btn">
+  ← Back to Portfolio
+</a>
+
+<div class="container">
+  
+  <h1>Budget Tracker (Excel)</h1>
+
+  <p class="subtitle">
+    A structured personal finance dashboard built to track discretionary spending, 
+    savings rate, and net worth growth using automated Excel formulas and dynamic charts.
+  </p>
+
+  <div class="mock-frame">
+    <img src="budget-preview.png" alt="Budget Tracker Excel Dashboard Preview">
+  </div>
+
+  <div class="details">
+
+    <h3>What This Tool Includes</h3>
+    <ul>
+      <li>Monthly categorized expense tracking</li>
+      <li>Automatic spending vs savings percentage</li>
+      <li>Net worth summary dashboard</li>
+      <li>Charted discretionary trends</li>
+      <li>Structured financial overview system</li>
+    </ul>
+
+    <h3>How To Use</h3>
+    <ol>
+      <li>Enter income at the top of the sheet.</li>
+      <li>Log transactions by category.</li>
+      <li>Separate large purchases for clarity.</li>
+      <li>Charts update automatically.</li>
+    </ol>
+
+    <div style="text-align:center;">
+      <a href="BudgetTracker.xlsx" download class="btn">
+        Download Excel File
+      </a>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
